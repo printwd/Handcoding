@@ -1,13 +1,6 @@
 import "@testing-library/jest-dom";
 import { vi } from "vitest";
 
-// Ensure jsdom globals are properly initialized before any other imports
-if (typeof global.window !== "undefined") {
-  global.window = window as any;
-  global.document = window.document;
-  global.navigator = window.navigator;
-}
-
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
   constructor() {}
