@@ -81,37 +81,31 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKER_USERNAME }}/handcoding
+          images: printwd/handcoding
           tags: |
             type=ref,event=branch
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push Docker image
+      - name: Build Docker image (local only)
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          push: false
+          load: true
+          tags: printwd/handcoding:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Verify Docker image
         run: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/handcoding:latest
-          docker run --rm ${{ secrets.DOCKER_USERNAME }}/handcoding:latest nginx -t
+          docker run --rm printwd/handcoding:latest nginx -t
+          echo "✅ Docker image built and verified successfully"
 
   # Job 4: Docker Compose Validation
   docker-compose:
